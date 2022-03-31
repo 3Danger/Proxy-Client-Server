@@ -1,0 +1,27 @@
+# ninja log v5
+1	136	1648761321960102064	CMakeFiles/Proxy_Client_Server.dir/main.cpp.o	3367f8faac38e64e
+136	170	1648761321993435403	Proxy_Client_Server	2b83c1201eed47dd
+0	127	1648764433773019461	CMakeFiles/Proxy_Client_Server.dir/main.cpp.o	fc9f8082655538c8
+1	137	1648764433783020018	CMakeFiles/Proxy_Client_Server.dir/srcs/ServerProxy.cpp.o	e27cb344c2fa4cc0
+137	172	1648764433819688725	Proxy_Client_Server	bb2750aea7fdf810
+0	130	1648764486762739887	CMakeFiles/Proxy_Client_Server.dir/main.cpp.o	fc9f8082655538c8
+130	168	1648764486796075202	Proxy_Client_Server	bb2750aea7fdf810
+0	180	1648764705113576578	CMakeFiles/Proxy_Client_Server.dir/srcs/ServerProxy.cpp.o	e27cb344c2fa4cc0
+180	232	1648764705163580028	Proxy_Client_Server	bb2750aea7fdf810
+0	167	1648764959837418377	CMakeFiles/Proxy_Client_Server.dir/srcs/ServerProxy.cpp.o	e27cb344c2fa4cc0
+167	208	1648764959874077693	Proxy_Client_Server	bb2750aea7fdf810
+0	154	1648765026792635096	CMakeFiles/Proxy_Client_Server.dir/srcs/ServerProxy.cpp.o	e27cb344c2fa4cc0
+154	195	1648765026832629318	Proxy_Client_Server	bb2750aea7fdf810
+0	152	1648765044083580834	CMakeFiles/Proxy_Client_Server.dir/main.cpp.o	fc9f8082655538c8
+152	191	1648765044120242670	Proxy_Client_Server	bb2750aea7fdf810
+1	182	1648765187353859928	CMakeFiles/Proxy_Client_Server.dir/main.cpp.o	fc9f8082655538c8
+1	142	1648765238444749538	CMakeFiles/Proxy_Client_Server.dir/main.cpp.o	fc9f8082655538c8
+0	182	1648765656842384253	CMakeFiles/Proxy_Client_Server.dir/main.cpp.o	fc9f8082655538c8
+0	189	1648765656849051096	CMakeFiles/Proxy_Client_Server.dir/srcs/ServerProxy.cpp.o	e27cb344c2fa4cc0
+189	240	1648765656899052423	Proxy_Client_Server	bb2750aea7fdf810
+1	146	1648766089424719377	CMakeFiles/Proxy_Client_Server.dir/main.cpp.o	fc9f8082655538c8
+1	156	1648766089434719136	CMakeFiles/Proxy_Client_Server.dir/srcs/ServerProxy.cpp.o	e27cb344c2fa4cc0
+156	194	1648766089474718174	Proxy_Client_Server	bb2750aea7fdf810
+0	138	1648766453621886952	CMakeFiles/Proxy_Client_Server.dir/main.cpp.o	fc9f8082655538c8
+1	147	1648766453628553653	CMakeFiles/Proxy_Client_Server.dir/srcs/ServerProxy.cpp.o	e27cb344c2fa4cc0
+147	184	1648766453665220505	Proxy_Client_Server	bb2750aea7fdf810
