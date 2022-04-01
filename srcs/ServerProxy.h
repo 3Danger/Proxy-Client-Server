@@ -15,20 +15,31 @@
 #include <iostream>
 #include <unistd.h>
 #include <netdb.h>
+#include <fcntl.h>
+
+#define SIZE_BUFF 256
 
 class ServerProxy {
-	int serverSocketFD;
-	addrinfo hints;
-	addrinfo * servInfo;
+	int ProxySocketFD;
+	int clientFD;
+	int serverFD;
+	addrinfo * ProxyInfo;
+	addrinfo * serverInfo;
+	char buff[SIZE_BUFF];
 public:
-	ServerProxy(char * port, char * ipAddres) throw();
+	ServerProxy(char const * port, char const * ipAddres) throw();
 	~ServerProxy();
+
+	int connectToClient() throw();
+	int connectToServer(char const * port, char const * ipAddres) throw();
+
 
 
 
 private:
 	int makeSocket() throw();
-	int makeBind() throw();
+	int makeBind(int fd, addrinfo * addr) throw();
+	addrinfo makeAddrinfoHints();
 };
 
 

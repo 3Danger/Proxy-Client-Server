@@ -4,6 +4,8 @@
 #include <iostream>
 #include "srcs/ServerProxy.h"
 int main(){
-	ServerProxy one("2221", "127.0.0.1");
+	ServerProxy server("2220", "127.0.0.1");
+	server.connectToClient();
+
 	std::cout << "there" << std::endl;
 }
