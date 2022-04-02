@@ -83,7 +83,7 @@ int ServerProxy::connectToServer(const char *port, const char *ipAddres) throw()
 			memset(buff, 0, readedBytes + 1);
 		}
 		write(1, "timer 1\n", 8);
-		usleep(125000);
+		usleep(525000);
 		readedBytes = recv(serverFD, buff, SIZE_BUFF, 0);
 		if (readedBytes > 0) {
 			send(clientFD, buff, readedBytes, 0);
@@ -91,7 +91,7 @@ int ServerProxy::connectToServer(const char *port, const char *ipAddres) throw()
 			write(1, buff, readedBytes);
 			memset(buff, 0, readedBytes + 1);
 		}
-		usleep(125000);
+		usleep(525000);
 		write(1, "timer 2\n", 8);
 	}
 }

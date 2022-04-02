@@ -17,7 +17,10 @@
 #include <netdb.h>
 #include <fcntl.h>
 
-#define SIZE_BUFF 256
+//TODO решить как правильно опустошить файловый дескриптор
+//TODO и почему не срабатывает O_NONBLOCKING
+
+#define SIZE_BUFF 11024
 
 class ServerProxy {
 	int proxySocketFD;
