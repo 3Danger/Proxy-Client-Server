@@ -42,10 +42,6 @@ public:
 	[[noreturn]] void run();
 	int connectToClient();
 	int connectToServer(char const * port, char const * ipAddres);
-
-
-
-
 private:
 	static int makeSocket();
 	static void makeBind(int fd, addrinfo * addr);
