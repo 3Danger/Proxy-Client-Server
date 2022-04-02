@@ -20,16 +20,17 @@
 #define SIZE_BUFF 256
 
 class ServerProxy {
-	int ProxySocketFD;
+	int proxySocketFD;
 	int clientFD;
 	int serverFD;
-	addrinfo * ProxyInfo;
+	addrinfo * proxyInfo;
 	addrinfo * serverInfo;
 	char buff[SIZE_BUFF];
 public:
 	ServerProxy(char const * port, char const * ipAddres) throw();
 	~ServerProxy();
 
+	[[noreturn]] void run();
 	int connectToClient() throw();
 	int connectToServer(char const * port, char const * ipAddres) throw();
 
@@ -37,8 +38,8 @@ public:
 
 
 private:
-	int makeSocket() throw();
-	int makeBind(int fd, addrinfo * addr) throw();
+	static int makeSocket() throw();
+	static int makeBind(int fd, addrinfo * addr) throw();
 	addrinfo makeAddrinfoHints();
 };
 
