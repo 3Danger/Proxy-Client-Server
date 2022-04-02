@@ -35,9 +35,8 @@ int ServerProxy::makeSocket() throw(){
 	return res;
 }
 
-int ServerProxy::makeBind(int fd, addrinfo * addr) throw() {
+void ServerProxy::makeBind(int fd, addrinfo * addr) throw() {
 	int res = bind(fd, addr->ai_addr, addr->ai_addrlen);
-//	int res = bind(proxySocketFD, proxyInfo->ai_addr, proxyInfo->ai_addrlen);
 	if (res < 0)
 		throw std::runtime_error(std::string("Bind error: ") + strerror(errno));
 	std::cout << "socket was binded" << std::endl;
@@ -50,7 +49,6 @@ int ServerProxy::connectToClient() throw(){
 	clientFD = accept(proxySocketFD, proxyInfo->ai_addr, &proxyInfo->ai_addrlen);
 	if (clientFD < 0 && errno != EAGAIN)
 		std::runtime_error(std::string("connection to client err: ") + strerror(errno));
-	fcntl(clientFD, F_SETFD, O_NONBLOCK);
 	return	clientFD;
 }
 
@@ -59,9 +57,8 @@ int ServerProxy::connectToServer(const char *port, const char *ipAddres) throw()
 	if (getaddrinfo(ipAddres, port, &hints, &serverInfo))
 		throw std::runtime_error(strerror(errno));
 	serverFD = makeSocket();
-	connect(serverFD, (sockaddr *)serverInfo->ai_addr, serverInfo->ai_addrlen);
-//	if (serverFD == 0)
-//		throw std::runtime_error(std::string("serverFD == 0: ") + strerror(errno));
+	if (connect(serverFD, (sockaddr *)serverInfo->ai_addr, serverInfo->ai_addrlen))
+		throw std::runtime_error(std::string("cannot connect to server: ") + strerror(errno));
 	if (serverFD < 0 && errno != EAGAIN)
 		throw std::runtime_error(strerror(errno));
 	fcntl(serverFD, F_SETFD, O_NONBLOCK);
@@ -82,7 +79,6 @@ int ServerProxy::connectToServer(const char *port, const char *ipAddres) throw()
 			write(1, buff, readedBytes);
 			memset(buff, 0, readedBytes + 1);
 		}
-		write(1, "timer 1\n", 8);
 		usleep(525000);
 		readedBytes = recv(serverFD, buff, SIZE_BUFF, 0);
 		if (readedBytes > 0) {
@@ -92,7 +88,6 @@ int ServerProxy::connectToServer(const char *port, const char *ipAddres) throw()
 			memset(buff, 0, readedBytes + 1);
 		}
 		usleep(525000);
-		write(1, "timer 2\n", 8);
 	}
 }
 

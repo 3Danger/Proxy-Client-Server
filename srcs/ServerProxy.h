@@ -42,7 +42,7 @@ public:
 
 private:
 	static int makeSocket() throw();
-	static int makeBind(int fd, addrinfo * addr) throw();
+	static void makeBind(int fd, addrinfo * addr) throw();
 	addrinfo makeAddrinfoHints();
 };
 
