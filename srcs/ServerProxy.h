@@ -17,13 +17,16 @@
 #include <netdb.h>
 #include <fcntl.h>
 #include <vector>
+#include <iostream>
+#include <fstream>
 
-//TODO решить как правильно опустошить файловый дескриптор
-//TODO и почему не срабатывает O_NONBLOCKING
 
 #define SIZE_BUFF 128
 
 class ServerProxy {
+	bool loop;
+
+	friend void stopSignal(int);
 	int proxySocketFD;
 	int clientFD;
 	int serverFD;
@@ -32,6 +35,7 @@ class ServerProxy {
 	char buff[SIZE_BUFF];
 	int maxFd;
 	fd_set fds;
+	std::string logFileName = "log.txt";;
 public:
 	ServerProxy(char const * port, char const * ipAddres) ;
 	~ServerProxy();
@@ -47,7 +51,7 @@ private:
 	static int makeSocket() ;
 	static void makeBind(int fd, addrinfo * addr) ;
 	addrinfo makeAddrinfoHints();
-	void Send(int from, int to, fd_set * fds_set);
+	void Send(int from, int to, fd_set * fds_set, std::ofstream & outFileLog);
 };
 
 

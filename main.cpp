@@ -8,6 +8,7 @@ int main(int ac, const char ** av){
 	std::string appName = av[0];
 	appName = appName.substr(appName.find_last_of('/'));
 	if (ac != 3){
+		std::cout << "Укажите адрес куда будем подключать прокси";
 		std::cout << "\nusage: ." << appName << " [port] [ipAddress]\n";
 		exit(0);
 	}
@@ -15,6 +16,7 @@ int main(int ac, const char ** av){
 	const char * port = av[1];
 	const char * address = av[2];
 
+	std::cout << "Информация для подключения клиента к прокси:\n";
 	std::cout << "for connect to proxy: port 2221, ipAddress 127.0.0.1\n";
 	ServerProxy server("2221", "127.0.0.1");
 

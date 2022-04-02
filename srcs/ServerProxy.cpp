@@ -2,7 +2,6 @@
 // Created by csamuro on 01.04.2022.
 //
 
-#include <algorithm>
 #include "ServerProxy.h"
 
 ServerProxy::ServerProxy(char const * port, char const * ipAddres)  {
@@ -18,6 +17,7 @@ ServerProxy::ServerProxy(char const * port, char const * ipAddres)  {
 		throw std::runtime_error("Listen error");
 	FD_ZERO(&fds);
 	FD_SET(proxySocketFD, &fds);
+	loop = true;
 }
 
 ServerProxy::~ServerProxy() {
@@ -49,7 +49,6 @@ void ServerProxy::makeBind(int fd, addrinfo * addr)  {
 }
 
 int ServerProxy::connectToClient() {
-
 	clientFD = accept(proxySocketFD, proxyInfo->ai_addr, &proxyInfo->ai_addrlen);
 	if (clientFD < 0 && errno != EAGAIN)
 		std::runtime_error(std::string("connection to client err: ") + strerror(errno));
@@ -75,12 +74,14 @@ int ServerProxy::connectToServer(const char *port, const char *ipAddres)  {
 
 [[noreturn]] void ServerProxy::run() {
 	int numOfSelect;
+	uint8_t whatLast = 0;
 	fd_set copyFds;
 	timeval tm = {0, 50000};
 
 	bzero(buff, SIZE_BUFF);
 	fcntl(clientFD, F_SETFD, O_NONBLOCK);
 	fcntl(serverFD, F_SETFD, O_NONBLOCK);
+	std::ofstream outFileLog;
 
 	while(true){
 		copyFds = fds;
@@ -88,19 +89,32 @@ int ServerProxy::connectToServer(const char *port, const char *ipAddres)  {
 		if (numOfSelect < 0)
 			throw std::runtime_error(std::string("select error: ") + strerror(errno));
 		if (numOfSelect > 0){
-			if (FD_ISSET(serverFD, &copyFds))
-				Send(serverFD, clientFD, &copyFds);
-			if (FD_ISSET(clientFD, &copyFds))
-				Send(clientFD, serverFD, &copyFds);
+			outFileLog.open(logFileName, std::ios::app);
+			if (FD_ISSET(serverFD, &copyFds)) {
+				if (whatLast != 1)
+					outFileLog << "\n\nSERVER REPLY:\n";
+				whatLast = 1;
+				Send(serverFD, clientFD, &copyFds, outFileLog);
+			}
+			if (FD_ISSET(clientFD, &copyFds)) {
+				if (whatLast != 2)
+					outFileLog << "\n\nCLIENT REPLY:\n";
+				whatLast = 2;
+				Send(clientFD, serverFD, &copyFds, outFileLog);
+			}
+			outFileLog.close();
 		}
 	}
 }
 
-void ServerProxy::Send(int from, int to, fd_set * fds_set){
-
+void ServerProxy::Send(int from, int to, fd_set * fds_set, std::ofstream & outFileLog){
 	FD_CLR(from, fds_set);
 	int readedBytes = recv(from, buff, SIZE_BUFF, 0);
 	send(to, buff, readedBytes, 0);
+	for(int i = 0; i < readedBytes; ++i)
+		if (buff[i] == '\u0002')
+			readedBytes = i;
+	outFileLog.write(buff, readedBytes);
 	bzero(buff, readedBytes);
 }
 
@@ -109,7 +123,6 @@ addrinfo ServerProxy::makeAddrinfoHints() {
 
 	hints.ai_family = AF_INET;
 	hints.ai_socktype = SOCK_STREAM;
-//	hints.ai_flags = AI_PASSIVE;
 	return hints;
 }
 
