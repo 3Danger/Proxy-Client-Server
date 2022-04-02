@@ -2,6 +2,7 @@
 // Created by csamuro on 01.04.2022.
 //
 
+#include <algorithm>
 #include "ServerProxy.h"
 
 ServerProxy::ServerProxy(char const * port, char const * ipAddres)  {
@@ -10,8 +11,13 @@ ServerProxy::ServerProxy(char const * port, char const * ipAddres)  {
 	addrinfo hints = makeAddrinfoHints();
 	if (getaddrinfo(ipAddres, port, &hints, &proxyInfo))
 		throw std::runtime_error(strerror(errno));
-	proxySocketFD = makeSocket();
+	maxFd = proxySocketFD = makeSocket();
 	makeBind(proxySocketFD, proxyInfo);
+	int resListen = listen(proxySocketFD, 1);
+	if (resListen < 0)
+		throw std::runtime_error("Listen error");
+	FD_ZERO(&fds);
+	FD_SET(proxySocketFD, &fds);
 }
 
 ServerProxy::~ServerProxy() {
@@ -43,12 +49,12 @@ void ServerProxy::makeBind(int fd, addrinfo * addr)  {
 }
 
 int ServerProxy::connectToClient() {
-	int resListen = listen(proxySocketFD, 1);
-	if (resListen < 0)
-		throw std::runtime_error("Listen error");
+
 	clientFD = accept(proxySocketFD, proxyInfo->ai_addr, &proxyInfo->ai_addrlen);
 	if (clientFD < 0 && errno != EAGAIN)
 		std::runtime_error(std::string("connection to client err: ") + strerror(errno));
+	FD_SET(clientFD, &fds);
+	maxFd = std::max(maxFd, clientFD);
 	return	clientFD;
 }
 
@@ -62,33 +68,40 @@ int ServerProxy::connectToServer(const char *port, const char *ipAddres)  {
 	if (serverFD < 0 && errno != EAGAIN)
 		throw std::runtime_error(strerror(errno));
 	fcntl(serverFD, F_SETFD, O_NONBLOCK);
+	FD_SET(serverFD, &fds);
+	maxFd = std::max(maxFd, serverFD);
 	return serverFD;
 }
 
-void ServerProxy::run() {
-	int readedBytes;
+[[noreturn]] void ServerProxy::run() {
+	int numOfSelect;
+	fd_set copyFds;
+	timeval tm = {0, 50000};
 
-	memset(buff, 0, SIZE_BUFF);
+	bzero(buff, SIZE_BUFF);
 	fcntl(clientFD, F_SETFD, O_NONBLOCK);
 	fcntl(serverFD, F_SETFD, O_NONBLOCK);
-	while(loop){
-		readedBytes = recv(clientFD, buff, SIZE_BUFF, 0);
-		if (readedBytes > 0){
-			send(serverFD, buff, readedBytes, 0);
-			write(1, "From client: ", 13);
-			write(1, buff, readedBytes);
-			memset(buff, 0, readedBytes + 1);
+
+	while(true){
+		copyFds = fds;
+		numOfSelect = select(maxFd + 1, &copyFds, NULL, NULL, &tm);
+		if (numOfSelect < 0)
+			throw std::runtime_error(std::string("select error: ") + strerror(errno));
+		if (numOfSelect > 0){
+			if (FD_ISSET(serverFD, &copyFds))
+				Send(serverFD, clientFD, &copyFds);
+			if (FD_ISSET(clientFD, &copyFds))
+				Send(clientFD, serverFD, &copyFds);
 		}
-		usleep(525000);
-		readedBytes = recv(serverFD, buff, SIZE_BUFF, 0);
-		if (readedBytes > 0) {
-			send(clientFD, buff, readedBytes, 0);
-			write(1, "From server: ", 13);
-			write(1, buff, readedBytes);
-			memset(buff, 0, readedBytes + 1);
-		}
-		usleep(525000);
 	}
+}
+
+void ServerProxy::Send(int from, int to, fd_set * fds_set){
+
+	FD_CLR(from, fds_set);
+	int readedBytes = recv(from, buff, SIZE_BUFF, 0);
+	send(to, buff, readedBytes, 0);
+	bzero(buff, readedBytes);
 }
 
 addrinfo ServerProxy::makeAddrinfoHints() {

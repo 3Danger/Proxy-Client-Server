@@ -16,11 +16,12 @@
 #include <unistd.h>
 #include <netdb.h>
 #include <fcntl.h>
+#include <vector>
 
 //TODO решить как правильно опустошить файловый дескриптор
 //TODO и почему не срабатывает O_NONBLOCKING
 
-#define SIZE_BUFF 2048
+#define SIZE_BUFF 128
 
 class ServerProxy {
 	int proxySocketFD;
@@ -29,12 +30,13 @@ class ServerProxy {
 	addrinfo * proxyInfo;
 	addrinfo * serverInfo;
 	char buff[SIZE_BUFF];
-	bool loop = true;
+	int maxFd;
+	fd_set fds;
 public:
 	ServerProxy(char const * port, char const * ipAddres) ;
 	~ServerProxy();
 
-	void run();
+	[[noreturn]] void run();
 	int connectToClient() ;
 	int connectToServer(char const * port, char const * ipAddres) ;
 
@@ -45,6 +47,7 @@ private:
 	static int makeSocket() ;
 	static void makeBind(int fd, addrinfo * addr) ;
 	addrinfo makeAddrinfoHints();
+	void Send(int from, int to, fd_set * fds_set);
 };
 
 
