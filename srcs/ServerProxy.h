@@ -26,7 +26,6 @@
 class ServerProxy {
 	bool loop;
 
-	friend void stopSignal(int);
 	int proxySocketFD;
 	int clientFD;
 	int serverFD;
@@ -35,21 +34,21 @@ class ServerProxy {
 	char buff[SIZE_BUFF];
 	int maxFd;
 	fd_set fds;
-	std::string logFileName = "log.txt";;
+	std::string logFileName = "log.txt";
 public:
-	ServerProxy(char const * port, char const * ipAddres) ;
+	ServerProxy(char const * port, char const * ipAddres);
 	~ServerProxy();
 
 	[[noreturn]] void run();
-	int connectToClient() ;
-	int connectToServer(char const * port, char const * ipAddres) ;
+	int connectToClient();
+	int connectToServer(char const * port, char const * ipAddres);
 
 
 
 
 private:
-	static int makeSocket() ;
-	static void makeBind(int fd, addrinfo * addr) ;
+	static int makeSocket();
+	static void makeBind(int fd, addrinfo * addr);
 	addrinfo makeAddrinfoHints();
 	void Send(int from, int to, fd_set * fds_set, std::ofstream & outFileLog);
 };
