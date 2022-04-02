@@ -4,7 +4,7 @@
 
 #include "ServerProxy.h"
 
-ServerProxy::ServerProxy(char const * port, char const * ipAddres) throw() {
+ServerProxy::ServerProxy(char const * port, char const * ipAddres)  {
 	clientFD = -1;
 	serverFD = -1;
 	addrinfo hints = makeAddrinfoHints();
@@ -25,7 +25,7 @@ ServerProxy::~ServerProxy() {
 	std::cout << "serverFD was closed from destructor!" << std::endl;
 }
 
-int ServerProxy::makeSocket() throw(){
+int ServerProxy::makeSocket() {
 
 	int res = socket(AF_INET, SOCK_STREAM, 0);
 	if (res < 0)
@@ -35,14 +35,14 @@ int ServerProxy::makeSocket() throw(){
 	return res;
 }
 
-void ServerProxy::makeBind(int fd, addrinfo * addr) throw() {
+void ServerProxy::makeBind(int fd, addrinfo * addr)  {
 	int res = bind(fd, addr->ai_addr, addr->ai_addrlen);
 	if (res < 0)
 		throw std::runtime_error(std::string("Bind error: ") + strerror(errno));
 	std::cout << "socket was binded" << std::endl;
 }
 
-int ServerProxy::connectToClient() throw(){
+int ServerProxy::connectToClient() {
 	int resListen = listen(proxySocketFD, 1);
 	if (resListen < 0)
 		throw std::runtime_error("Listen error");
@@ -52,7 +52,7 @@ int ServerProxy::connectToClient() throw(){
 	return	clientFD;
 }
 
-int ServerProxy::connectToServer(const char *port, const char *ipAddres) throw() {
+int ServerProxy::connectToServer(const char *port, const char *ipAddres)  {
 	addrinfo hints = makeAddrinfoHints();
 	if (getaddrinfo(ipAddres, port, &hints, &serverInfo))
 		throw std::runtime_error(strerror(errno));
@@ -65,13 +65,13 @@ int ServerProxy::connectToServer(const char *port, const char *ipAddres) throw()
 	return serverFD;
 }
 
-[[noreturn]] void ServerProxy::run() {
+void ServerProxy::run() {
 	int readedBytes;
 
 	memset(buff, 0, SIZE_BUFF);
 	fcntl(clientFD, F_SETFD, O_NONBLOCK);
 	fcntl(serverFD, F_SETFD, O_NONBLOCK);
-	while(true){
+	while(loop){
 		readedBytes = recv(clientFD, buff, SIZE_BUFF, 0);
 		if (readedBytes > 0){
 			send(serverFD, buff, readedBytes, 0);

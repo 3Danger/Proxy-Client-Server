@@ -20,7 +20,7 @@
 //TODO решить как правильно опустошить файловый дескриптор
 //TODO и почему не срабатывает O_NONBLOCKING
 
-#define SIZE_BUFF 11024
+#define SIZE_BUFF 2048
 
 class ServerProxy {
 	int proxySocketFD;
@@ -29,20 +29,21 @@ class ServerProxy {
 	addrinfo * proxyInfo;
 	addrinfo * serverInfo;
 	char buff[SIZE_BUFF];
+	bool loop = true;
 public:
-	ServerProxy(char const * port, char const * ipAddres) throw();
+	ServerProxy(char const * port, char const * ipAddres) ;
 	~ServerProxy();
 
-	[[noreturn]] void run();
-	int connectToClient() throw();
-	int connectToServer(char const * port, char const * ipAddres) throw();
+	void run();
+	int connectToClient() ;
+	int connectToServer(char const * port, char const * ipAddres) ;
 
 
 
 
 private:
-	static int makeSocket() throw();
-	static void makeBind(int fd, addrinfo * addr) throw();
+	static int makeSocket() ;
+	static void makeBind(int fd, addrinfo * addr) ;
 	addrinfo makeAddrinfoHints();
 };
 
